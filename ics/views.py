@@ -1,13 +1,22 @@
+from django.http import HttpResponse
+
+def dashboard(request):
+    return render(request, 'dashboard.html')
+
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from .models import RawMaterialInventory, FinishedProductInventory, Production, Product, Organization
 from .serializers import RawMaterialInventorySerializer, FinishedProductInventorySerializer, ProductionSerializer
 from .models import RawMaterialInventory, FinishedProductInventory, MovementLog, BarcodedProduct, BarcodeCategory
 from .serializers import MovementLogSerializer, OrganizationSerializer, BarcodedProductSerializer, BarcodeCategorySerializer
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.shortcuts import render
 
 
 class OrganizationListCreateAPIView(APIView):
@@ -22,7 +31,10 @@ class OrganizationListCreateAPIView(APIView):
             'data': serializer.data
         }
         return Response(response, status=status.HTTP_200_OK)
-
+    
+    def dashboard(request):
+        return render(request, 'dashboard.html')
+    
     def post(self, request):
         serializer = OrganizationSerializer(data=request.data)
         if serializer.is_valid():

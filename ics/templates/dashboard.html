@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICS — Inventory Control System</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <script src="dashboard.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body data-role="admin" data-section="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">ICS</span>
+        <span class="brand-sub">Inventory Control</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Core</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard" data-icon="fa-gauge">
+        <i class="fa-solid fa-gauge"></i><span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-section="products" data-icon="fa-cube">
+        <i class="fa-solid fa-cube"></i><span>Products</span>
+        <span class="nav-badge">124</span>
+      </a>
+      <a href="#" class="nav-item" data-section="inventory" data-icon="fa-warehouse">
+        <i class="fa-solid fa-warehouse"></i><span>Inventory</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">Procurement</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item" data-section="requisition" data-icon="fa-clipboard-list">
+        <i class="fa-solid fa-clipboard-list"></i><span>Requisition</span>
+        <span class="nav-badge alert">7</span>
+      </a>
+      <a href="#" class="nav-item" data-section="quotations" data-icon="fa-file-invoice">
+        <i class="fa-solid fa-file-invoice"></i><span>Quotations</span>
+      </a>
+      <a href="#" class="nav-item" data-section="purchase-orders" data-icon="fa-cart-flatbed">
+        <i class="fa-solid fa-cart-flatbed"></i><span>Purchase Orders</span>
+      </a>
+      <a href="#" class="nav-item" data-section="invoices" data-icon="fa-receipt">
+        <i class="fa-solid fa-receipt"></i><span>Invoices</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">Operations</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item" data-section="checkin" data-icon="fa-arrow-right-to-bracket">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i><span>Check-In</span>
+      </a>
+      <a href="#" class="nav-item" data-section="checkout" data-icon="fa-arrow-right-from-bracket">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i><span>Check-Out</span>
+      </a>
+      <a href="#" class="nav-item" data-section="acknowledge" data-icon="fa-circle-check">
+        <i class="fa-solid fa-circle-check"></i><span>Acknowledge</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">RFID / Tracking</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item" data-section="rfid" data-icon="fa-wifi">
+        <i class="fa-solid fa-wifi"></i><span>RFID Scanner</span>
+      </a>
+      <a href="#" class="nav-item" data-section="barcode" data-icon="fa-barcode">
+        <i class="fa-solid fa-barcode"></i><span>Barcode</span>
+      </a>
+      <a href="#" class="nav-item" data-section="shelf" data-icon="fa-layer-group">
+        <i class="fa-solid fa-layer-group"></i><span>Shelf Life</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-section-label">Reports</div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item" data-section="reports" data-icon="fa-chart-line">
+        <i class="fa-solid fa-chart-line"></i><span>Reports</span>
+      </a>
+      <a href="#" class="nav-item admin-only" data-section="users" data-icon="fa-users">
+        <i class="fa-solid fa-users"></i><span>User Management</span>
+      </a>
+      <a href="#" class="nav-item admin-only" data-section="dealers" data-icon="fa-handshake">
+        <i class="fa-solid fa-handshake"></i><span>Dealers</span>
+      </a>
+      <a href="#" class="nav-item admin-only" data-section="settings" data-icon="fa-gear">
+        <i class="fa-solid fa-gear"></i><span>Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="topbar-breadcrumb">
+        <span id="breadcrumbLabel">Dashboard</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="role-switcher">
+          <label for="roleSelect">View as</label>
+          <select id="roleSelect">
+            <option value="admin">Admin</option>
+            <option value="dealer">Dealer</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+
+        <button class="topbar-btn" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <button class="topbar-btn" title="Search" id="searchToggle">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <div class="user-avatar" id="userAvatarBtn" title="Profile">
+          <span>AD</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar" id="searchBar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Search products, orders, RFID codes..." id="globalSearch" />
+      <kbd>ESC</kbd>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <main class="content" id="mainContent">
+
+      <!-- ====== DASHBOARD ====== -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1>Overview</h1>
+            <p class="page-subtitle">Real-time inventory and procurement status</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-arrow-rotate-right"></i> Refresh</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Requisition</button>
+          </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-blue"><i class="fa-solid fa-cube"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Total Products</span>
+              <span class="kpi-value" data-count="1247">0</span>
+              <span class="kpi-delta up"><i class="fa-solid fa-arrow-trend-up"></i> 3.2% this month</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-green"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">In Stock</span>
+              <span class="kpi-value" data-count="984">0</span>
+              <span class="kpi-delta up"><i class="fa-solid fa-arrow-trend-up"></i> 1.4% this week</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Low Stock</span>
+              <span class="kpi-value" data-count="38">0</span>
+              <span class="kpi-delta down"><i class="fa-solid fa-arrow-trend-down"></i> Needs reorder</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-purple"><i class="fa-solid fa-clipboard-list"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Open Requisitions</span>
+              <span class="kpi-value" data-count="7">0</span>
+              <span class="kpi-delta neutral"><i class="fa-solid fa-clock"></i> Awaiting approval</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-teal"><i class="fa-solid fa-receipt"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Pending Invoices</span>
+              <span class="kpi-value" data-count="12">0</span>
+              <span class="kpi-delta neutral"><i class="fa-solid fa-clock"></i> Pending payment</span>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon kpi-red"><i class="fa-solid fa-truck"></i></div>
+            <div class="kpi-data">
+              <span class="kpi-label">Deliveries Today</span>
+              <span class="kpi-value" data-count="5">0</span>
+              <span class="kpi-delta up"><i class="fa-solid fa-check"></i> 3 completed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHART + RECENT ACTIVITY -->
+        <div class="dashboard-grid">
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>Stock Movement</h3>
+              <div class="chart-tabs">
+                <button class="chart-tab active" data-range="7d">7D</button>
+                <button class="chart-tab" data-range="30d">30D</button>
+                <button class="chart-tab" data-range="90d">90D</button>
+              </div>
+            </div>
+            <canvas id="stockChart" height="200"></canvas>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Procurement Flow</h3>
+              <span class="card-badge">Live</span>
+            </div>
+            <div class="flow-steps">
+              <div class="flow-step completed">
+                <div class="step-dot"><i class="fa-solid fa-check"></i></div>
+                <div class="step-content">
+                  <span class="step-title">Requisition #REQ-0042</span>
+                  <span class="step-meta">Submitted · 2 hrs ago</span>
+                </div>
+              </div>
+              <div class="flow-step active">
+                <div class="step-dot"><i class="fa-solid fa-hourglass-half"></i></div>
+                <div class="step-content">
+                  <span class="step-title">Quotation Review</span>
+                  <span class="step-meta">3 vendors responded</span>
+                </div>
+              </div>
+              <div class="flow-step pending">
+                <div class="step-dot"><i class="fa-regular fa-circle"></i></div>
+                <div class="step-content">
+                  <span class="step-title">Purchase Order</span>
+                  <span class="step-meta">Awaiting approval</span>
+                </div>
+              </div>
+              <div class="flow-step pending">
+                <div class="step-dot"><i class="fa-regular fa-circle"></i></div>
+                <div class="step-content">
+                  <span class="step-title">Invoice Generation</span>
+                  <span class="step-meta">Not started</span>
+                </div>
+              </div>
+              <div class="flow-step pending">
+                <div class="step-dot"><i class="fa-regular fa-circle"></i></div>
+                <div class="step-content">
+                  <span class="step-title">Delivery &amp; Acknowledge</span>
+                  <span class="step-meta">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABLES ROW -->
+        <div class="tables-row">
+          <div class="card table-card">
+            <div class="card-header">
+              <h3>Recent Requisitions</h3>
+              <a href="#" class="card-link" data-go="requisition">View all</a>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>REQ ID</th><th>Item</th><th>Qty</th><th>Status</th><th>Date</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>REQ-0042</code></td><td>PCBA Boards</td><td>200</td><td><span class="badge badge-warning">Pending</span></td><td>28 Jun</td></tr>
+                <tr><td><code>REQ-0041</code></td><td>Spare Parts</td><td>50</td><td><span class="badge badge-success">Approved</span></td><td>27 Jun</td></tr>
+                <tr><td><code>REQ-0040</code></td><td>Raw Material</td><td>1000</td><td><span class="badge badge-info">Ordered</span></td><td>26 Jun</td></tr>
+                <tr><td><code>REQ-0039</code></td><td>Other (Misc)</td><td>15</td><td><span class="badge badge-success">Approved</span></td><td>25 Jun</td></tr>
+                <tr><td><code>REQ-0038</code></td><td>Challan Items</td><td>300</td><td><span class="badge badge-danger">Rejected</span></td><td>24 Jun</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card table-card">
+            <div class="card-header">
+              <h3>Low Stock Alert</h3>
+              <a href="#" class="card-link" data-go="inventory">View all</a>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>Product</th><th>Category</th><th>Stock</th><th>Min</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>PCBA Module A</td><td>Electronics</td><td><span class="stock-low">12</span></td><td>50</td></tr>
+                <tr><td>Spare Pin Set</td><td>Spare Parts</td><td><span class="stock-low">3</span></td><td>20</td></tr>
+                <tr><td>Adhesive Tape</td><td>Materials</td><td><span class="stock-warn">28</span></td><td>30</td></tr>
+                <tr><td>Heat Shrink 5mm</td><td>Materials</td><td><span class="stock-warn">19</span></td><td>25</td></tr>
+                <tr><td>IC Chip 74HC</td><td>Electronics</td><td><span class="stock-low">6</span></td><td>40</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== REQUISITION ====== -->
+      <section class="page" id="page-requisition">
+        <div class="page-header">
+          <div><h1>Requisitions</h1><p class="page-subtitle">Manage material and product requests</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-filter"></i> Filter</button>
+            <button class="btn btn-primary" id="newReqBtn"><i class="fa-solid fa-plus"></i> New Requisition</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" placeholder="Search requisitions..." class="filter-input" />
+          <select class="filter-select"><option>All Status</option><option>Pending</option><option>Approved</option><option>Ordered</option><option>Rejected</option></select>
+          <select class="filter-select"><option>All Categories</option><option>Raw Material</option><option>Spare Parts</option><option>PCBA</option><option>Other</option></select>
+          <input type="date" class="filter-input" style="max-width:160px;" />
+        </div>
+
+        <div class="card">
+          <table class="data-table full">
+            <thead>
+              <tr><th><input type="checkbox" /></th><th>REQ ID</th><th>Item Description</th><th>Category</th><th>Qty</th><th>Requested By</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="reqTableBody">
+              <tr><td><input type="checkbox" /></td><td><code>REQ-0042</code></td><td>PCBA Boards — Type B</td><td>Electronics</td><td>200</td><td>Ahmed K.</td><td>28 Jun 2026</td><td><span class="badge badge-warning">Pending</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button><button class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></button><button class="action-btn danger" title="Reject"><i class="fa-solid fa-xmark"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><code>REQ-0041</code></td><td>Spare Parts Set C</td><td>Spare Parts</td><td>50</td><td>Sara M.</td><td>27 Jun 2026</td><td><span class="badge badge-success">Approved</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button><button class="action-btn" title="Edit"><i class="fa-solid fa-pen"></i></button><button class="action-btn success" title="Create PO"><i class="fa-solid fa-check"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><code>REQ-0040</code></td><td>Raw Material — Grade A</td><td>Raw Material</td><td>1000</td><td>Rahim H.</td><td>26 Jun 2026</td><td><span class="badge badge-info">Ordered</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><code>REQ-0039</code></td><td>Other Consumables</td><td>Other</td><td>15</td><td>Noor F.</td><td>25 Jun 2026</td><td><span class="badge badge-success">Approved</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+              <tr><td><input type="checkbox" /></td><td><code>REQ-0038</code></td><td>Challan — June Batch</td><td>Other</td><td>300</td><td>Karim T.</td><td>24 Jun 2026</td><td><span class="badge badge-danger">Rejected</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+            </tbody>
+          </table>
+          <div class="table-footer">
+            <span class="table-count">Showing 5 of 42 records</span>
+            <div class="pagination">
+              <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== QUOTATIONS ====== -->
+      <section class="page" id="page-quotations">
+        <div class="page-header">
+          <div><h1>Quotations</h1><p class="page-subtitle">Compare vendor quotations and select best offer</p></div>
+          <div class="page-actions">
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Request Quote</button>
+          </div>
+        </div>
+        <div class="quote-cards">
+          <div class="quote-card selected">
+            <div class="quote-header">
+              <span class="quote-vendor">Vendor Alpha Ltd.</span>
+              <span class="badge badge-success">Best Price</span>
+            </div>
+            <div class="quote-detail">
+              <div class="quote-item"><span>Item</span><strong>PCBA Boards</strong></div>
+              <div class="quote-item"><span>Unit Price</span><strong>৳ 320</strong></div>
+              <div class="quote-item"><span>Qty</span><strong>200</strong></div>
+              <div class="quote-item"><span>Total</span><strong class="quote-total">৳ 64,000</strong></div>
+              <div class="quote-item"><span>Delivery</span><strong>5 days</strong></div>
+              <div class="quote-item"><span>Validity</span><strong>15 Jul 2026</strong></div>
+            </div>
+            <button class="btn btn-primary btn-full">Select &amp; Create PO</button>
+          </div>
+          <div class="quote-card">
+            <div class="quote-header">
+              <span class="quote-vendor">Beta Electronics</span>
+              <span class="badge badge-info">Faster Delivery</span>
+            </div>
+            <div class="quote-detail">
+              <div class="quote-item"><span>Item</span><strong>PCBA Boards</strong></div>
+              <div class="quote-item"><span>Unit Price</span><strong>৳ 345</strong></div>
+              <div class="quote-item"><span>Qty</span><strong>200</strong></div>
+              <div class="quote-item"><span>Total</span><strong class="quote-total">৳ 69,000</strong></div>
+              <div class="quote-item"><span>Delivery</span><strong>3 days</strong></div>
+              <div class="quote-item"><span>Validity</span><strong>12 Jul 2026</strong></div>
+            </div>
+            <button class="btn btn-outline btn-full">Select</button>
+          </div>
+          <div class="quote-card">
+            <div class="quote-header">
+              <span class="quote-vendor">Gamma Supplies</span>
+            </div>
+            <div class="quote-detail">
+              <div class="quote-item"><span>Item</span><strong>PCBA Boards</strong></div>
+              <div class="quote-item"><span>Unit Price</span><strong>৳ 310</strong></div>
+              <div class="quote-item"><span>Qty</span><strong>200</strong></div>
+              <div class="quote-item"><span>Total</span><strong class="quote-total">৳ 62,000</strong></div>
+              <div class="quote-item"><span>Delivery</span><strong>10 days</strong></div>
+              <div class="quote-item"><span>Validity</span><strong>10 Jul 2026</strong></div>
+            </div>
+            <button class="btn btn-outline btn-full">Select</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== PURCHASE ORDERS ====== -->
+      <section class="page" id="page-purchase-orders">
+        <div class="page-header">
+          <div><h1>Purchase Orders</h1><p class="page-subtitle">Track and manage all purchase orders</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-download"></i> Export</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create PO</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="data-table full">
+            <thead><tr><th>PO Number</th><th>Vendor</th><th>Items</th><th>Value</th><th>Delivery</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><code>PO-2026-019</code></td><td>Vendor Alpha Ltd.</td><td>PCBA Boards ×200</td><td>৳ 64,000</td><td>03 Jul 2026</td><td><span class="badge badge-info">In Transit</span></td><td><div class="action-btns"><button class="action-btn" title="View"><i class="fa-solid fa-eye"></i></button><button class="action-btn" title="Print"><i class="fa-solid fa-print"></i></button></div></td></tr>
+              <tr><td><code>PO-2026-018</code></td><td>Beta Electronics</td><td>Spare Parts ×50</td><td>৳ 18,500</td><td>02 Jul 2026</td><td><span class="badge badge-success">Delivered</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+              <tr><td><code>PO-2026-017</code></td><td>Gamma Supplies</td><td>Raw Material ×1000</td><td>৳ 120,000</td><td>05 Jul 2026</td><td><span class="badge badge-warning">Pending</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====== INVOICES ====== -->
+      <section class="page" id="page-invoices">
+        <div class="page-header">
+          <div><h1>Invoices</h1><p class="page-subtitle">Generate and manage supplier invoices</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-file-export"></i> Export PDF</button>
+            <button class="btn btn-primary" id="genInvoiceBtn"><i class="fa-solid fa-plus"></i> Generate Invoice</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="data-table full">
+            <thead><tr><th>Invoice #</th><th>PO Ref</th><th>Vendor</th><th>Amount</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><code>INV-2026-031</code></td><td>PO-2026-018</td><td>Beta Electronics</td><td>৳ 18,500</td><td>15 Jul 2026</td><td><span class="badge badge-warning">Unpaid</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button><button class="action-btn success"><i class="fa-solid fa-check"></i></button></div></td></tr>
+              <tr><td><code>INV-2026-030</code></td><td>PO-2026-017</td><td>Gamma Supplies</td><td>৳ 120,000</td><td>10 Jul 2026</td><td><span class="badge badge-success">Paid</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+              <tr><td><code>INV-2026-029</code></td><td>PO-2026-016</td><td>Vendor Alpha</td><td>৳ 42,000</td><td>05 Jul 2026</td><td><span class="badge badge-danger">Overdue</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====== PRODUCTS ====== -->
+      <section class="page" id="page-products">
+        <div class="page-header">
+          <div><h1>Products</h1><p class="page-subtitle">Master product catalog</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-upload"></i> Import CSV</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Product</button>
+          </div>
+        </div>
+
+        <div class="product-category-tabs">
+          <button class="cat-tab active">All</button>
+          <button class="cat-tab">Raw Material</button>
+          <button class="cat-tab">Spare Parts</button>
+          <button class="cat-tab">PCBA</button>
+          <button class="cat-tab">Other</button>
+          <button class="cat-tab">Challan</button>
+        </div>
+
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div class="product-info">
+              <span class="product-name">PCBA Board — Type A</span>
+              <span class="product-sku">SKU: PCBA-001-A</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">In Stock</span>
+              <span class="stock-value ok">142</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-wifi"></i> RFID: AA:4C:88</span>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-wrench"></i></div>
+            <div class="product-info">
+              <span class="product-name">Spare Pin Set — C3</span>
+              <span class="product-sku">SKU: SPR-003-C</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">Low Stock</span>
+              <span class="stock-value low">3</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-wifi"></i> RFID: BC:7E:21</span>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-flask"></i></div>
+            <div class="product-info">
+              <span class="product-name">Raw Material — Grade A</span>
+              <span class="product-sku">SKU: RAW-010-A</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">In Stock</span>
+              <span class="stock-value ok">880</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-wifi"></i> RFID: DE:3A:55</span>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-box"></i></div>
+            <div class="product-info">
+              <span class="product-name">Adhesive Tape — 50mm</span>
+              <span class="product-sku">SKU: MAT-022-T</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">Warn</span>
+              <span class="stock-value warn">28</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-barcode"></i> BC: 982741</span>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-memory"></i></div>
+            <div class="product-info">
+              <span class="product-name">IC Chip 74HC245</span>
+              <span class="product-sku">SKU: IC-074-H</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">Low Stock</span>
+              <span class="stock-value low">6</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-wifi"></i> RFID: FF:9C:10</span>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="product-info">
+              <span class="product-name">Heat Shrink — 5mm</span>
+              <span class="product-sku">SKU: MAT-031-H</span>
+            </div>
+            <div class="product-stock">
+              <span class="stock-label">Warn</span>
+              <span class="stock-value warn">19</span>
+            </div>
+            <div class="product-meta">
+              <span class="rfid-tag"><i class="fa-solid fa-barcode"></i> BC: 774412</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== CHECK-IN ====== -->
+      <section class="page" id="page-checkin">
+        <div class="page-header">
+          <div><h1>Check-In</h1><p class="page-subtitle">Log items received at warehouse</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-wifi"></i> Scan RFID</button>
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Manual Entry</button>
+          </div>
+        </div>
+        <div class="checkin-grid">
+          <div class="card">
+            <h3 class="form-section-title">Scan / Enter Item</h3>
+            <div class="scan-box">
+              <div class="scan-icon"><i class="fa-solid fa-wifi"></i></div>
+              <p>Scan RFID or barcode, or enter item code below</p>
+              <div class="scan-input-row">
+                <input type="text" placeholder="Enter RFID / Barcode / SKU..." class="scan-input" id="checkinScan" />
+                <button class="btn btn-primary" id="checkinLookup">Lookup</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" placeholder="Auto-filled on scan" id="checkinProductName" />
+              </div>
+              <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" placeholder="0" id="checkinQty" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>PO Reference</label>
+                <input type="text" placeholder="PO-2026-019" id="checkinPO" />
+              </div>
+              <div class="form-group">
+                <label>Shelf Location</label>
+                <input type="text" placeholder="A-12-3" id="checkinShelf" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Remarks</label>
+              <textarea rows="2" placeholder="Optional notes..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-full" id="checkinSubmit">Confirm Check-In</button>
+          </div>
+          <div class="card">
+            <h3 class="form-section-title">Today's Check-In Log</h3>
+            <table class="data-table full">
+              <thead><tr><th>Time</th><th>Item</th><th>Qty</th><th>Location</th></tr></thead>
+              <tbody>
+                <tr><td>15:40</td><td>PCBA Board A</td><td>50</td><td>A-12-1</td></tr>
+                <tr><td>13:25</td><td>Spare Pins C3</td><td>20</td><td>B-04-2</td></tr>
+                <tr><td>10:10</td><td>Raw Material</td><td>400</td><td>C-01-1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== CHECK-OUT ====== -->
+      <section class="page" id="page-checkout">
+        <div class="page-header">
+          <div><h1>Check-Out</h1><p class="page-subtitle">Issue items from warehouse</p></div>
+          <div class="page-actions">
+            <button class="btn btn-primary"><i class="fa-solid fa-arrow-right-from-bracket"></i> Issue Items</button>
+          </div>
+        </div>
+        <div class="checkin-grid">
+          <div class="card">
+            <h3 class="form-section-title">Issue Item</h3>
+            <div class="scan-box">
+              <div class="scan-icon"><i class="fa-solid fa-barcode"></i></div>
+              <p>Scan item or enter details manually</p>
+              <div class="scan-input-row">
+                <input type="text" placeholder="Enter RFID / Barcode / SKU..." class="scan-input" />
+                <button class="btn btn-primary">Lookup</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Product</label><input type="text" placeholder="Auto-filled" /></div>
+              <div class="form-group"><label>Qty to Issue</label><input type="number" placeholder="0" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Issued To (Dept / Person)</label><input type="text" placeholder="Production Dept." /></div>
+              <div class="form-group"><label>Purpose</label><input type="text" placeholder="Manufacturing run #12" /></div>
+            </div>
+            <button class="btn btn-primary btn-full">Confirm Check-Out</button>
+          </div>
+          <div class="card">
+            <h3 class="form-section-title">Today's Check-Out Log</h3>
+            <table class="data-table full">
+              <thead><tr><th>Time</th><th>Item</th><th>Qty</th><th>Issued To</th></tr></thead>
+              <tbody>
+                <tr><td>14:55</td><td>IC Chip 74HC</td><td>10</td><td>Production</td></tr>
+                <tr><td>12:00</td><td>Adhesive Tape</td><td>5</td><td>Packing</td></tr>
+                <tr><td>09:30</td><td>Heat Shrink 5mm</td><td>100</td><td>Assembly</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== ACKNOWLEDGE ====== -->
+      <section class="page" id="page-acknowledge">
+        <div class="page-header">
+          <div><h1>Acknowledge</h1><p class="page-subtitle">Acknowledge received deliveries and confirm quantities</p></div>
+        </div>
+        <div class="card">
+          <table class="data-table full">
+            <thead><tr><th>Delivery ID</th><th>PO Ref</th><th>Vendor</th><th>Items</th><th>Received By</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><code>DEL-0088</code></td><td>PO-2026-019</td><td>Vendor Alpha</td>
+                <td>PCBA Boards ×200</td><td>—</td><td>28 Jun 2026</td>
+                <td><button class="btn btn-primary btn-sm" onclick="acknowledge(this)"><i class="fa-solid fa-check"></i> Acknowledge</button></td>
+              </tr>
+              <tr>
+                <td><code>DEL-0087</code></td><td>PO-2026-018</td><td>Beta Electronics</td>
+                <td>Spare Parts ×50</td><td>Ahmed K.</td><td>27 Jun 2026</td>
+                <td><span class="badge badge-success"><i class="fa-solid fa-check"></i> Done</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====== DEALERS (ADMIN) ====== -->
+      <section class="page admin-only" id="page-dealers">
+        <div class="page-header">
+          <div><h1>Dealers</h1><p class="page-subtitle">Manage dealer accounts and access</p></div>
+          <div class="page-actions">
+            <button class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Dealer</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="data-table full">
+            <thead><tr><th>Dealer ID</th><th>Name</th><th>Contact</th><th>Region</th><th>Access Level</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><code>DLR-001</code></td><td>Rafi Traders</td><td>+880 1700-000001</td><td>Dhaka</td><td>Check-In / Out / Ack</td><td><span class="badge badge-success">Active</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+              <tr><td><code>DLR-002</code></td><td>Metro Supplies</td><td>+880 1800-000002</td><td>Chittagong</td><td>Check-In / Out</td><td><span class="badge badge-warning">Pending</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-eye"></i></button><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====== USERS (ADMIN) ====== -->
+      <section class="page admin-only" id="page-users">
+        <div class="page-header">
+          <div><h1>User Management</h1><p class="page-subtitle">Manage system users and role permissions</p></div>
+          <div class="page-actions">
+            <button class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Add User</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="data-table full">
+            <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td><div class="user-cell"><div class="mini-avatar">AK</div>Ahmed Karim</div></td><td>ahmed@ics.bd</td><td><span class="badge badge-purple">Admin</span></td><td>28 Jun 2026 · 15:40</td><td><span class="badge badge-success">Active</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+              <tr><td><div class="user-cell"><div class="mini-avatar">SM">SM</div>Sara M.</div></td><td>sara@ics.bd</td><td><span class="badge badge-info">User</span></td><td>28 Jun 2026 · 11:20</td><td><span class="badge badge-success">Active</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+              <tr><td><div class="user-cell"><div class="mini-avatar">RH</div>Rahim H.</div></td><td>rahim@dealer.bd</td><td><span class="badge badge-amber">Dealer</span></td><td>27 Jun 2026 · 09:00</td><td><span class="badge badge-warning">Restricted</span></td><td><div class="action-btns"><button class="action-btn"><i class="fa-solid fa-pen"></i></button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====== REPORTS (USER VIEW) ====== -->
+      <section class="page" id="page-reports">
+        <div class="page-header">
+          <div><h1>Reports</h1><p class="page-subtitle">Inventory analytics and audit logs</p></div>
+          <div class="page-actions">
+            <button class="btn btn-outline"><i class="fa-solid fa-download"></i> Export</button>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-icon kpi-blue"><i class="fa-solid fa-arrow-trend-up"></i></div><div class="kpi-data"><span class="kpi-label">Total Check-Ins (Jun)</span><span class="kpi-value" data-count="348">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-icon kpi-red"><i class="fa-solid fa-arrow-trend-down"></i></div><div class="kpi-data"><span class="kpi-label">Total Check-Outs (Jun)</span><span class="kpi-value" data-count="291">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-icon kpi-green"><i class="fa-solid fa-file-invoice"></i></div><div class="kpi-data"><span class="kpi-label">Invoices Paid (Jun)</span><span class="kpi-value" data-count="18">0</span></div></div>
+          <div class="kpi-card"><div class="kpi-icon kpi-amber"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="kpi-data"><span class="kpi-label">Stock Alerts (Jun)</span><span class="kpi-value" data-count="5">0</span></div></div>
+        </div>
+        <div class="card" style="margin-top:20px;">
+          <div class="card-header"><h3>Condition Overview</h3></div>
+          <div class="condition-table">
+            <div class="condition-row header"><span>Condition</span><span>Products Affected</span><span>Action Needed</span></div>
+            <div class="condition-row"><span><i class="fa-solid fa-triangle-exclamation" style="color:#e67e22;"></i> Low Stock (&lt;10%)</span><span>12 SKUs</span><span>Create requisition</span></div>
+            <div class="condition-row"><span><i class="fa-solid fa-clock" style="color:#e74c3c;"></i> Shelf Life Expiring (&lt;30 days)</span><span>3 SKUs</span><span>Priority dispatch</span></div>
+            <div class="condition-row"><span><i class="fa-solid fa-circle-check" style="color:#27ae60;"></i> Normal Stock</span><span>109 SKUs</span><span>No action</span></div>
+            <div class="condition-row"><span><i class="fa-solid fa-ban" style="color:#e74c3c;"></i> Out of Stock</span><span>2 SKUs</span><span>Urgent requisition</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Placeholder pages -->
+      <section class="page" id="page-inventory"><div class="page-header"><div><h1>Inventory</h1><p class="page-subtitle">Full warehouse inventory view</p></div></div><div class="empty-state"><i class="fa-solid fa-warehouse"></i><p>Inventory management module</p></div></section>
+      <section class="page" id="page-rfid"><div class="page-header"><div><h1>RFID Scanner</h1><p class="page-subtitle">Live RFID scan feed</p></div></div><div class="empty-state"><i class="fa-solid fa-wifi"></i><p>RFID scanning module</p></div></section>
+      <section class="page" id="page-barcode"><div class="page-header"><div><h1>Barcode</h1><p class="page-subtitle">Barcode lookup and scanning</p></div></div><div class="empty-state"><i class="fa-solid fa-barcode"></i><p>Barcode module</p></div></section>
+      <section class="page" id="page-shelf"><div class="page-header"><div><h1>Shelf Life</h1><p class="page-subtitle">Monitor expiry and shelf dates</p></div></div><div class="empty-state"><i class="fa-solid fa-calendar-days"></i><p>Shelf life module</p></div></section>
+      <section class="page admin-only" id="page-settings"><div class="page-header"><div><h1>Settings</h1><p class="page-subtitle">System configuration</p></div></div><div class="empty-state"><i class="fa-solid fa-gear"></i><p>Settings module</p></div></section>
+
+    </main>
+
+    <!-- FOOTER / DATABASE STATUS BAR -->
+    <footer class="db-footer">
+      <div class="db-footer-inner">
+        <div class="db-section">
+          <span class="db-label"><i class="fa-solid fa-database"></i> Databases</span>
+          <div class="db-items">
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> Products DB</span>
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> Cashel DB</span>
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> Delivery DB</span>
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> Finance DB</span>
+          </div>
+        </div>
+        <div class="db-section">
+          <span class="db-label"><i class="fa-solid fa-wifi"></i> Services</span>
+          <div class="db-items">
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> RFID Gateway</span>
+            <span class="db-item warn"><i class="fa-solid fa-circle"></i> MQTT Broker</span>
+            <span class="db-item online"><i class="fa-solid fa-circle"></i> Barcode API</span>
+          </div>
+        </div>
+        <div class="db-section db-meta">
+          <span><i class="fa-solid fa-clock"></i> Last sync: <span id="lastSync">—</span></span>
+          <span><i class="fa-solid fa-user-shield"></i> Role: <span id="roleLabel">Admin</span></span>
+          <span>ICS v2.4.1</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- NEW REQUISITION MODAL -->
+  <div class="modal-overlay" id="reqModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New Requisition</h2>
+        <button class="modal-close" id="closeReqModal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group"><label>Item Description</label><input type="text" placeholder="e.g. PCBA Boards — Type A" /></div>
+          <div class="form-group"><label>Category</label>
+            <select><option>Select category</option><option>Raw Material</option><option>Spare Parts</option><option>PCBA</option><option>Other</option><option>Challan</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Quantity Required</label><input type="number" placeholder="0" /></div>
+          <div class="form-group"><label>Required By</label><input type="date" /></div>
+        </div>
+        <div class="form-group"><label>Justification / Notes</label><textarea rows="3" placeholder="Reason for requisition..."></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Priority</label>
+            <select><option>Normal</option><option>High</option><option>Urgent</option></select>
+          </div>
+          <div class="form-group"><label>Estimated Cost (৳)</label><input type="number" placeholder="0.00" /></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelReqModal">Cancel</button>
+        <button class="btn btn-primary">Submit Requisition</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
